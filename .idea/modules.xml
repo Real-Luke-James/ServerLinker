@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/MCLinkerCMPSMP.iml" filepath="$PROJECT_DIR$/.idea/modules/MCLinkerCMPSMP.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/MCLinkerCMPSMP.client.iml" filepath="$PROJECT_DIR$/.idea/modules/MCLinkerCMPSMP.client.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/MCLinkerCMPSMP.main.iml" filepath="$PROJECT_DIR$/.idea/modules/MCLinkerCMPSMP.main.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/MCLinkerCMPSMP.test.iml" filepath="$PROJECT_DIR$/.idea/modules/MCLinkerCMPSMP.test.iml" />

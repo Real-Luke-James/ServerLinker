@@ -3,3 +3,5 @@
 /build/
 /build/classes/java/client/
 /build/classes/java/main/
+/run/
+/src/main/java/net/lukeit/linker/Linker.java.old
