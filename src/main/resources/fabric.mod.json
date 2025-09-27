@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "linker",
+  "version": "1.0",
+  "name": "Minecraft Linker with CMP & SMP",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/linker/icon.png",
+  "environment": "server",
+  "entrypoints": {
+    "fabric-datagen": [
+      "net.lukeit.linker.client.LinkerDataGenerator"
+    ],
+    "main": [
+      "net.lukeit.linker.Linker"
+    ]
+  },
+  "mixins": [
+    "linker.mixins.json",
+    {
+      "config": "linker.client.mixins.json",
+      "environment": "client"
+    }
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}

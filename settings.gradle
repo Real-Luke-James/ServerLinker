@@ -1,0 +1,13 @@
+pluginManagement {
+    repositories {
+        maven {
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
+        maven {
+            name = 'Geyser'
+            url = 'https://repo.opencollabl.dev/main/'
+        }
+        gradlePluginPortal()
+    }
+}

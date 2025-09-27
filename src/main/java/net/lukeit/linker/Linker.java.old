@@ -1,0 +1,79 @@
+package net.lukeit.linker;
+
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.StringArgumentType;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.registry.RegistryWrapper;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.Text;
+import org.geysermc.floodgate.api.FloodgateApi;
+
+public class Linker implements ModInitializer {
+
+    @Override
+    public void onInitialize() {
+        CommandRegistrationCallback.EVENT.register(this::registerCommands);
+    }
+    private void registerCommands(CommandDispatcher<ServerCommandSource> dispatcher,
+                                  RegistryWrapper.WrapperLookup registryAccess,
+                                  CommandManager.RegistrationEnvironment env) {
+        dispatcher.register(CommandManager.literal("smp")
+                .executes(ctx -> forwardTransfer(ctx, 35565)));
+    }
+
+    private int forwardTransfer(com.mojang.brigadier.context.CommandContext<ServerCommandSource> ctx, Integer portArg) {
+        ServerCommandSource src = ctx.getSource();
+
+        if (!(src.getEntity() instanceof ServerPlayerEntity player)) {
+            src.sendError(Text.literal("[Linker] Only players may use transfer commands."));
+            return 0;
+        }
+
+        String host = "5jsmp.lukeit.net";
+        int port = 35565; // default 25565
+
+        boolean isBedrock = FloodgateApi.getInstance().isFloodgatePlayer(player.getUuid());
+
+        if (isBedrock) {
+            // Use Floodgate API to transfer Bedrock players directly (avoids syntax issues).
+            try {
+                boolean ok = FloodgateApi.getInstance().transferPlayer(player.getUuid(), host, port);
+                if (!ok) {
+                    src.sendError(Text.literal("[Linker] Floodgate transfer failed (check address/port)."));
+                    System.err.println("[Linker] Floodgate.transferPlayer returned false for: " + host + ":" + port);
+                    return 0;
+                }
+                src.sendFeedback(() -> Text.literal("[AliasMod] Transferring (Bedrock): " + host + ":" + port), false);
+                return 1;
+            } catch (Exception e) {
+                src.sendError(Text.literal("[AliasMod] Error transferring (Bedrock); check server log."));
+                System.err.println("[AliasMod] Exception while Floodgate.transferPlayer:");
+                e.printStackTrace();
+                return 0;
+            }
+        } else {
+            // Java: build the Java syntax: transfer <hostname> [<port>] [<players>]
+            String cmd = (portArg == null) ? ("transfer " + host) : ("transfer " + host + " " + port);
+            try {
+                int result = src.getServer().getCommandManager().getDispatcher().execute(cmd, src);
+                if (result == 0) {
+                    src.sendFeedback(() -> Text.literal("[AliasMod] Command ran but returned 0: " + cmd), false);
+                }
+                return result;
+            } catch (CommandSyntaxException e) {
+                src.sendError(Text.literal("[AliasMod] Syntax error: " + e.getMessage()));
+                return 0;
+            } catch (Exception e) {
+                src.sendError(Text.literal("[AliasMod] Unexpected error. See server log."));
+                System.err.println("[AliasMod] Exception while executing: " + cmd);
+                e.printStackTrace();
+                return 0;
+            }
+        }
+    }
+}
